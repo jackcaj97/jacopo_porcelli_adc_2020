@@ -9,7 +9,7 @@ import java.util.Random;
  * Class that handles a whole sudoku board.
  *
  */
-public class SudokuField {
+public class SudokuField implements Serializable {
 
 	private final int blockSize;	// Size of a single block of the board. In a standard sudoku matrix a block is made up of 3*3 cells.
 	private final int fieldSize;	// Size of a line/column of the matrix, but also of a single block.

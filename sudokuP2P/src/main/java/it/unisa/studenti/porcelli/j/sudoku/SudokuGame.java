@@ -1,5 +1,7 @@
 package it.unisa.studenti.porcelli.j.sudoku;
 
+import it.unisa.studenti.porcelli.j.sudoku.board.BoardManager;
+
 /**
 Copyright 2017 Universita' degli Studi di Salerno
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +24,10 @@ public interface SudokuGame {
 	/**
 	 * Creates a new sudoku game.
 	 * @param _game_name a String, the sudoku game name.
-	 * @return integer matrix containing the grid of the sudoku game created.
+	 * @param _difficulty integer representing the difficulty of the sudoku board.
+	 * @return BoardManager object containing the grid field of the sudoku game created.
 	 */
-	public Integer[][] generateNewSudoku(String _game_name);
+	public BoardManager generateNewSudoku(String _game_name, int _difficulty);
 	
 	
 	/**

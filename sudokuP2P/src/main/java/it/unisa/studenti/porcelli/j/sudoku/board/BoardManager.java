@@ -1,16 +1,30 @@
 package it.unisa.studenti.porcelli.j.sudoku.board;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Class for managing all the interactions with a sudoku board.
  * @author Jacopo Porcelli
  *
  */
-public class BoardManager {
+public class BoardManager implements Serializable {
 	
-	private SudokuField field;
+	private SudokuField field;			// Actual sudoku board.
+	private ArrayList<String> players;	// Players list
+	private ArrayList<Integer> scores;	// Players' scores list.
 	
-	public BoardManager() {
+	private String name;
+	private int difficulty;
+	
+	public BoardManager(String name, int difficulty) {
+		
+		players = new ArrayList<String>();
+		scores = new ArrayList<Integer>();
+		
+		this.name = name;
+		this.difficulty = difficulty;
+		
 		field = new SudokuField(3);
 		
 		generateFullField(1, 1);
@@ -45,6 +59,15 @@ public class BoardManager {
 	    }
 	}
 	
+	
+	/** 
+	 * Applies the chosen difficulty for the board. 
+	 */
+	private void applyDifficulty() {
+		
+	}
+	
+	
 	/**
 	 * Prints on stdout the sudoku board created.
 	 */
@@ -68,7 +91,7 @@ public class BoardManager {
 	 * Returns the board in a bidimensional array.
 	 * @return
 	 */
-	public int[][] getMatrix() {
+	public int[][] getAsMatrix() {
 		int matrix[][] = new int[9][9];
 		
 		for(int i = 0; i < 9; i++) {
@@ -78,6 +101,49 @@ public class BoardManager {
 		}
 		
 		return matrix;
+	}
+
+	
+	// Getters and Setters
+	
+	public SudokuField getField() {
+		return field;
+	}
+
+	public void setField(SudokuField field) {
+		this.field = field;
+	}
+
+	public ArrayList<String> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers(ArrayList<String> players) {
+		this.players = players;
+	}
+
+	public ArrayList<Integer> getScores() {
+		return scores;
+	}
+
+	public void setScores(ArrayList<Integer> scores) {
+		this.scores = scores;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
 	}
 	
 }
