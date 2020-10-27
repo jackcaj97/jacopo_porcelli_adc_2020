@@ -4,7 +4,8 @@
   
   <groupId>it.unisa.studenti.porcelli.j</groupId>
   <artifactId>sudokuP2P</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
+  <packaging>jar</packaging>
   
   <name>P2P Sudoku</name>
   <description>Sudoku game made in a P2P system, allowing all the peers to play in different Sudoku games.</description>

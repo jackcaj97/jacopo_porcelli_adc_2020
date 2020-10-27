@@ -1,6 +1,6 @@
 FROM alpine/git
 WORKDIR /app
-RUN git clone https://https://github.com/jackcaj97/SudokuP2P.git
+RUN git clone https://github.com/jackcaj97/SudokuP2P.git
 
 FROM maven:3.5-jdk-8-alpine
 WORKDIR /app
