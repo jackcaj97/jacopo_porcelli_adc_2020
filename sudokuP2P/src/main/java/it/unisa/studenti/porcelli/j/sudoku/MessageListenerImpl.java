@@ -18,7 +18,7 @@ public class MessageListenerImpl implements MessageListener {
 		
 		TextIO textIO = TextIoFactory.getTextIO();
 		TextTerminal terminal = textIO.getTextTerminal();
-		terminal.printf("\n"+peerid+"] (Direct Message Received) "+obj+"\n\n");
+		terminal.printf("\n"+peerid+"] (A Sudoku has just been completed!) Sudoku name: "+obj+"\n\n");
 		return "success";
 	}
 

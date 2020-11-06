@@ -40,7 +40,7 @@ public class Game {
 				printMenu(terminal);
 				
 				int option = textIO.newIntInputReader()
-						.withMaxVal(5)
+						.withMaxVal(6)
 						.withMinVal(1)
 						.read("Option");
 				switch (option) {
@@ -67,7 +67,7 @@ public class Game {
 					else if((peer.generateNewSudokuImproved(name, difficulty)) != null)
 						terminal.printf("\n- Sudoku game %s successfully created\n", name);
 					else
-						terminal.printf("\n- Error in the creation of the Sudou game %d\n", name);
+						terminal.printf("\n- Error in the creation of the Sudou game %d, it may already exist.\n", name);
 					break;
 				case 2:
 					terminal.printf("\nEnter the name of the Sudoku game you wish to join\n");
@@ -78,6 +78,7 @@ public class Game {
 					String nickname = textIO.newStringInputReader()
 					        .withDefaultValue("default-nickname")
 					        .read("Nickname:");
+					
 					if(peer.join(sname, nickname))
 						terminal.printf("\n- Successfully joined game %s as %s\n", sname, nickname);
 					else

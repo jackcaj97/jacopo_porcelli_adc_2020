@@ -31,6 +31,10 @@ public class BoardManager implements Serializable {
 		generateFullField(1, 1);
 	}
 	
+	public BoardManager() {
+		
+	}
+	
 	/**
 	 * Generates the board for the sudoku game already filled with numbers.
 	 * @param row index of the first row.
