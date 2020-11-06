@@ -33,12 +33,8 @@ public class Game {
 			TextTerminal terminal = textIO.getTextTerminal();
 			SudokuGameImpl peer = new SudokuGameImpl(id, master, new MessageListenerImpl(id));
 			
-			terminal.printf("\nStaring peer id: %d on master node: %s\n",
+			terminal.printf("\nStarting peer id: %d on master node: %s\n",
 					id, master);
-			
-			// TODO: remove
-			//BoardManager board = new BoardManager();
-			//board.printBoard();
 			
 			while(true) {
 				printMenu(terminal);
@@ -53,7 +49,7 @@ public class Game {
 					String name = textIO.newStringInputReader()
 					        .withDefaultValue("default-sudoku")
 					        .read("Name:");
-					terminal.printf("\nEnter the difficulty\n1- Very Easy\n2- Easy\n3- Normal\n4- Hard\n5- Very Hard\n6- Insane (no, really, are you insane? :o)\n");
+					terminal.printf("\nEnter the difficulty\n1- Very Easy\n2- Easy\n3- Normal\n4- Hard\n5- Very Hard\n6- Insane (no, really... are you insane? :o)\n\n");
 					String difficultyString = textIO.newStringInputReader()
 					        .withDefaultValue("1")
 					        .read(" Difficulty:");
@@ -68,7 +64,7 @@ public class Game {
 					
 					if(difficulty < 1 || difficulty > 6)
 						terminal.printf("\n- Error: choose an acceptable difficulty from the list\n", name);
-					else if((peer.generateNewSudoku(name, difficulty)) != null)
+					else if((peer.generateNewSudokuImproved(name, difficulty)) != null)
 						terminal.printf("\n- Sudoku game %s successfully created\n", name);
 					else
 						terminal.printf("\n- Error in the creation of the Sudou game %d\n", name);
@@ -143,6 +139,16 @@ public class Game {
 
 					break;
 				case 5:
+					terminal.printf("\nEnter the name of the Sudoku game you wish to leave\n");
+					String lname = textIO.newStringInputReader()
+					        .withDefaultValue("default-sudoku")
+					        .read("Name:");
+					if(peer.leaveGame(lname))
+						terminal.printf("\n- Successfully left game %s\n", lname);
+					else
+						terminal.printf("\n- Error in leaving the game %s\n", lname);
+					break;
+				case 6:
 					terminal.printf("\nAre you sure you want to leave the Network?\n");
 					boolean exit = textIO.newBooleanInputReader().withDefaultValue(false).read("exit?");
 					if(exit) {
@@ -168,7 +174,8 @@ public class Game {
 		terminal.printf("\n2 - Join a Sudoku game\n");
 		terminal.printf("\n3 - Get a Sudoku board\n");
 		terminal.printf("\n4 - Place a number\n");
-		terminal.printf("\n5 - EXIT\n");
+		terminal.printf("\n5 - Leave a game\n");
+		terminal.printf("\n6 - EXIT\n");
 	}
 	
 }

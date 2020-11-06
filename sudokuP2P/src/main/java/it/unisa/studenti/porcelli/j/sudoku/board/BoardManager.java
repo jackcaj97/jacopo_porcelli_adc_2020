@@ -10,6 +10,8 @@ import java.util.ArrayList;
  */
 public class BoardManager implements Serializable {
 	
+	private final int DEFAULT_DIFFICULTY = 10;
+	
 	private SudokuField field;			// Actual sudoku board.
 	private ArrayList<String> players;	// Players list
 	private ArrayList<Integer> scores;	// Players' scores list.
@@ -17,13 +19,12 @@ public class BoardManager implements Serializable {
 	private String name;
 	private int difficulty;
 	
-	public BoardManager(String name, int difficulty) {
+	public BoardManager(String name) {
 		
 		players = new ArrayList<String>();
 		scores = new ArrayList<Integer>();
 		
 		this.name = name;
-		this.difficulty = difficulty;
 		
 		field = new SudokuField(3);
 		
@@ -61,10 +62,17 @@ public class BoardManager implements Serializable {
 	
 	
 	/** 
-	 * Applies the chosen difficulty for the board. 
+	 * Applies the chosen difficulty for the board by removing a certain amount of numbers from it.
 	 */
-	private void applyDifficulty() {
+	public void applyDifficulty(Integer[][] board, int difficulty) {
+		int numsToDelete = DEFAULT_DIFFICULTY*difficulty;
 		
+		for(int d = 0; d < numsToDelete; d++) {
+			int i = (int) (Math.random() * 10) % 9;
+			int j = (int) (Math.random() * 10) % 9;
+			
+			board[i][j] = 0;
+		}
 	}
 	
 	
@@ -87,12 +95,28 @@ public class BoardManager implements Serializable {
 		}
 	}
 	
+	public void printMatrix(Integer[][] matrix) {
+		for(int i = 0; i < 9; i++) {
+			for(int j = 0; j < 9; j++) {
+				System.out.print(matrix[i][j] + " ");
+				if(j%3 == 2)
+					System.out.print("|");
+			}
+			System.out.print("\n");
+			if(i%3 == 2) {
+				for(int k = 0; k < 10; k++)
+					System.out.print("__");
+				System.out.print("\n");
+			}
+		}
+	}
+	
 	/**
 	 * Returns the board in a bidimensional array.
 	 * @return
 	 */
-	public int[][] getAsMatrix() {
-		int matrix[][] = new int[9][9];
+	public Integer[][] getAsMatrix() {
+		Integer matrix[][] = new Integer[9][9];
 		
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {

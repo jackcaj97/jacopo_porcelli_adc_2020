@@ -24,10 +24,9 @@ public interface SudokuGame {
 	/**
 	 * Creates a new sudoku game.
 	 * @param _game_name a String, the sudoku game name.
-	 * @param _difficulty integer representing the difficulty of the sudoku board.
-	 * @return BoardManager object containing the grid field of the sudoku game created.
+	 * @return Bidimensional array containing the grid field of the sudoku game created.
 	 */
-	public BoardManager generateNewSudoku(String _game_name, int _difficulty);
+	public Integer[][] generateNewSudoku(String _game_name);
 	
 	
 	/**
