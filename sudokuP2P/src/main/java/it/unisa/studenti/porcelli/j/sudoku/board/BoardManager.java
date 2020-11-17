@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class BoardManager implements Serializable {
 	
-	private final int DEFAULT_DIFFICULTY = 10;
+	private final int DEFAULT_DIFFICULTY = 5;
 	
 	private SudokuField field;			// Actual sudoku board.
 	private ArrayList<String> players;	// Players list
@@ -70,6 +70,8 @@ public class BoardManager implements Serializable {
 	 */
 	public void applyDifficulty(Integer[][] board, int difficulty) {
 		int numsToDelete = DEFAULT_DIFFICULTY*difficulty;
+		if(difficulty == 0)
+			numsToDelete = 1;
 		
 		for(int d = 0; d < numsToDelete; d++) {
 			int i = (int) (Math.random() * 10) % 9;
@@ -129,6 +131,81 @@ public class BoardManager implements Serializable {
 		}
 		
 		return matrix;
+	}
+	
+	/**
+	 * Tries to place a number in the matrix.
+	 * @param matrix Matrix to fill with the new number.
+	 * @param i Row in which to place the number
+	 * @param j Column in which to place the number
+	 * @param number Number to place.
+	 * @return Score obtained, 0 if the position was already filled, -1 if the position in incorrect and 1 if the position is correct.
+	 */
+	public int placeNumInMatrix(Integer[][] matrix, int i, int j, int number) {
+		
+		if(matrix[i][j] != 0) {	// Number already placed.
+			return 0;
+		}
+		else {
+			if(checkPosition(matrix, i, j, number)) {	// Number correctly placed.
+				matrix[i][j] = number;
+				return 1;
+			}
+			else {
+				return -1;
+			}
+		}
+	}
+	
+	private boolean checkPosition(Integer[][] matrix, int i, int j, int number) {
+		
+		return checkRow(matrix, i, number) && checkColumn(matrix, j, number) && checkSubGrid(matrix, i, j, number);
+	}
+	
+	private boolean checkRow(Integer[][] matrix, int row, int number) {
+		
+		for(int k = 0; k < 9; k++) {
+			if(matrix[row][k] == number)
+				return false;
+		}
+		
+		return true;
+	}
+	
+	private boolean checkColumn(Integer[][] matrix, int column, int number) {
+		for(int k = 0; k < 9; k++) {
+			if(matrix[k][column] == number)
+				return false;
+		}
+		
+		return true;
+	}
+	
+	private boolean checkSubGrid(Integer[][] matrix, int i, int j, int number) {
+		
+		int r = i, c = j;	// Start of sub grid.
+		
+		r = (r / 3) * 3;
+		c = (c / 3) * 3;
+		
+		for (int m = r; m < r + 3; m++) {
+			for (int n = c; n < c + 3; n++) {
+				if (matrix[m][n] == number) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean isCompleted(Integer[][] matrix) {
+		for(int i = 0; i < 9; i++)
+			for(int j = 0; j < 9; j++)
+				if(matrix[i][j] == 0)
+					return false;
+		
+		return true;
 	}
 
 	

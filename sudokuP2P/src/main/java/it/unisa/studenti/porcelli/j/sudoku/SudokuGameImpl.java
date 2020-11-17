@@ -37,7 +37,7 @@ public class SudokuGameImpl implements SudokuGame {
 	final private ArrayList<String> j_games_nick=new ArrayList<String>();	// List of joined sudoku game boards' nicknames used.
 	
 	private int difficultyToApply;
-	private BoardManager bManager;
+	private BoardManager bManager;	// To handle everything related to the sudoku board.
 	
 	public SudokuGameImpl( int _id, String _master_peer, final MessageListener _listener) throws Exception {
 		bManager = new BoardManager();
@@ -94,7 +94,7 @@ public class SudokuGameImpl implements SudokuGame {
 			futureGet = _dht.get(Number160.createHash(_game_name + scores_game_name)).start();
 			futureGet.awaitUninterruptibly();
 			if (futureGet.isSuccess() && futureGet.isEmpty())
-				_dht.put(Number160.createHash(_game_name + scores_game_name)).data(new Data(new ArrayList<PeerAddress>())).start().awaitUninterruptibly();
+				_dht.put(Number160.createHash(_game_name + scores_game_name)).data(new Data(new ArrayList<Integer>())).start().awaitUninterruptibly();
 			
 			// TODO: remove
 			//board.printBoard();
@@ -134,16 +134,32 @@ public class SudokuGameImpl implements SudokuGame {
 		try {
 			Integer[][] sudokuBoard = null;
 			
+			// Adding the nickname to the list of nicks for the sudoku game.
+			FutureGet futureGet = _dht.get(Number160.createHash(_game_name + nicks_game_name)).start();
+			futureGet.awaitUninterruptibly();
+			if (futureGet.isSuccess()) {
+				if(futureGet.isEmpty()) 
+					return false;
+							
+				ArrayList<String> nicknames_of_game;
+				nicknames_of_game = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
+				if(nicknames_of_game.contains(_nickname))
+					return false;
+				nicknames_of_game.add(_nickname);	// Adds the nickname chosen to the list of nicks for that game.
+				_dht.put(Number160.createHash(_game_name + nicks_game_name)).data(new Data(nicknames_of_game)).start().awaitUninterruptibly();
+			}
+			
 			// Fetching the sudoku game board.
-			FutureGet futureGet = _dht.get(Number160.createHash(_game_name)).start();
+			futureGet = _dht.get(Number160.createHash(_game_name)).start();
 			futureGet.awaitUninterruptibly();
 			if (futureGet.isSuccess()) {
 				if(futureGet.isEmpty()) 
 					return false;
 				
-				// Fetch of the board and the associated players' list from the dht.
+				// Fetch of the board from the dht.
 				sudokuBoard = (Integer[][]) futureGet.dataMap().values().iterator().next().object();
 				
+				j_games_nick.add(_nickname);
 				j_games.add(sudokuBoard);	// Appends the fetched game to the list of joined games.
 				j_games_names.add(_game_name);	// Appends the game's name to the list of joined games.
 			}
@@ -159,19 +175,6 @@ public class SudokuGameImpl implements SudokuGame {
 				players_peers_of_game = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
 				players_peers_of_game.add(_dht.peer().peerAddress());	// Adds itself to the peers list for that game.
 				_dht.put(Number160.createHash(_game_name + players_game_name)).data(new Data(players_peers_of_game)).start().awaitUninterruptibly();
-			}
-			
-			// Adding the nickname to the list of nicks for the sudoku game.
-			futureGet = _dht.get(Number160.createHash(_game_name + nicks_game_name)).start();
-			futureGet.awaitUninterruptibly();
-			if (futureGet.isSuccess()) {
-				if(futureGet.isEmpty()) 
-					return false;
-				
-				ArrayList<String> nicknames_of_game;
-				nicknames_of_game = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
-				nicknames_of_game.add(_nickname);	// Adds the nickname chosen to the list of nicks for that game.
-				_dht.put(Number160.createHash(_game_name + nicks_game_name)).data(new Data(nicknames_of_game)).start().awaitUninterruptibly();
 			}
 			
 			// Adding a new personal score on the list for that sudoku game.
@@ -201,13 +204,123 @@ public class SudokuGameImpl implements SudokuGame {
 	
 	
 	public Integer[][] getSudoku(String _game_name) {
+		
+		try {
+			Integer[][] sudokuBoard = null;
+			
+			// Fetching the sudoku game board.
+			FutureGet futureGet = _dht.get(Number160.createHash(_game_name)).start();
+			futureGet.awaitUninterruptibly();
+			if (futureGet.isSuccess()) {
+				if(futureGet.isEmpty()) 
+					return null;
+				
+				// Fetch of the board from the dht.
+				sudokuBoard = (Integer[][]) futureGet.dataMap().values().iterator().next().object();
+			
+				return sudokuBoard;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return null;
 	}
 	
 	
 	
+	@SuppressWarnings("unchecked")
 	public Integer placeNumber(String _game_name, int _i, int _j, int _number) {
-		return 0;
+		
+		// Check whether the game has been joined. Cannot place a number in a game that hasn't been joined yet.
+		if(!j_games_names.contains(_game_name))
+			return -2;
+		
+		try {
+			Integer[][] sudokuBoard = getSudoku(_game_name);
+			
+			if(sudokuBoard != null) {
+				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number);
+				
+				if(score == 1) {	// Update the matrix and the score for the leaderboard.
+					
+					// Fetch the position and the nickname used for this game.
+					int localIndex = j_games_names.indexOf(_game_name);	// Index of local arraylists.
+					String nicknameUsed = j_games_names.get(localIndex);
+					int globalIndex = -1;	// Index in arrays on the dht.
+					
+					// Fetching the nicknames' list.
+					FutureGet futureGet = _dht.get(Number160.createHash(_game_name + nicks_game_name)).start();
+					futureGet.awaitUninterruptibly();
+					if (futureGet.isSuccess()) {
+						if(futureGet.isEmpty()) 
+							return -2;
+									
+						ArrayList<String> nicknames_of_game;
+						nicknames_of_game = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
+						globalIndex = nicknames_of_game.indexOf(nicknameUsed);
+						
+						if(globalIndex == -1)	// Something went wrong.
+							return -2;
+						
+					}
+					
+					// Updating the sudoku game board on the dht.
+					futureGet = _dht.get(Number160.createHash(_game_name)).start();
+					futureGet.awaitUninterruptibly();
+					if (futureGet.isSuccess()) {
+						if(futureGet.isEmpty()) 
+							return -2;
+						
+						_dht.put(Number160.createHash(_game_name)).data(new Data(sudokuBoard)).start().awaitUninterruptibly();
+					}
+					
+					// Updating the personal score on the list for that sudoku game.
+					futureGet = _dht.get(Number160.createHash(_game_name + scores_game_name)).start();
+					futureGet.awaitUninterruptibly();
+					if (futureGet.isSuccess()) {
+						if(futureGet.isEmpty()) 
+							return -2;
+						
+						ArrayList<Integer> scores_of_game;
+						scores_of_game = (ArrayList<Integer>) futureGet.dataMap().values().iterator().next().object();
+						scores_of_game.set(globalIndex, scores_of_game.get(globalIndex) + score);		// Adds the starting score to the list of scores for that game.
+						_dht.put(Number160.createHash(_game_name + scores_game_name)).data(new Data(scores_of_game)).start().awaitUninterruptibly();
+					}
+					
+					// Notify all the players for that Sudoku about the new score.
+					futureGet = _dht.get(Number160.createHash(_game_name + players_game_name)).start();
+					futureGet.awaitUninterruptibly();
+					if (futureGet.isSuccess()) {
+						
+						String message = "";
+						// If the board has just been completed.
+						if(bManager.isCompleted(sudokuBoard))
+							message = _game_name + " - " + nicknameUsed + " has just completed the sudoku!";
+						else
+							message = _game_name + " - " + nicknameUsed + " has just scored a point!";
+						
+						HashSet<PeerAddress> peers_on_topic;
+						peers_on_topic = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+						for(PeerAddress peer:peers_on_topic)
+						{
+							FutureDirect futureDirect = _dht.peer().sendDirect(peer).object(message).start();
+							futureDirect.awaitUninterruptibly();
+						}
+					}
+				}
+				return score;
+			}
+			else {
+				return -2;
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return -2;
 	}
 	
 	/**
@@ -215,9 +328,61 @@ public class SudokuGameImpl implements SudokuGame {
 	 * @param _game_name String of the name of the game to leave.
 	 * @return true if the game is successfully left, false otherwise.
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean leaveGame(String _game_name) {
 		
-		// TODO: Rimuoversi dalla lista di players associati ad un dato game_name (game_name_players)
+		try {
+			
+			// Removes itself from the list of peers playing this sudoku game.
+			FutureGet futureGet = _dht.get(Number160.createHash(_game_name + players_game_name)).start();
+			futureGet.awaitUninterruptibly();
+			if (futureGet.isSuccess()) {
+				if(futureGet.isEmpty()) 
+					return false;
+				HashSet<PeerAddress> players_peers_of_game;
+				players_peers_of_game = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+				players_peers_of_game.remove(_dht.peer().peerAddress());
+				_dht.put(Number160.createHash(_game_name + players_game_name)).data(new Data(players_peers_of_game)).start().awaitUninterruptibly();
+			}
+			
+			int indexToDeleteLocal = j_games_names.indexOf(_game_name);	// Index for the local lists.
+			String nicknameToDelete = j_games_nick.get(indexToDeleteLocal);
+			int indexToDelete = 0;	// Index for the global lists.
+			
+			// Removes itself from the list of nicknames of players playing this sudoku game.
+			futureGet = _dht.get(Number160.createHash(_game_name + nicks_game_name)).start();
+			futureGet.awaitUninterruptibly();
+			if (futureGet.isSuccess()) {
+				if(futureGet.isEmpty()) 
+					return false;
+				ArrayList<String> nicks_of_game;
+				nicks_of_game = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
+				indexToDelete = nicks_of_game.indexOf(nicknameToDelete);	// Posizione del nickname nella lista sulla dht.
+				nicks_of_game.remove(indexToDelete);
+				_dht.put(Number160.createHash(_game_name + nicks_game_name)).data(new Data(nicks_of_game)).start().awaitUninterruptibly();
+			}
+			
+			// Removes itself from the list of scores of players playing this sudoku game.
+			futureGet = _dht.get(Number160.createHash(_game_name + scores_game_name)).start();
+			futureGet.awaitUninterruptibly();
+			if (futureGet.isSuccess()) {
+				if(futureGet.isEmpty()) 
+					return false;
+				ArrayList<Integer> scores_of_game;
+				scores_of_game = (ArrayList<Integer>) futureGet.dataMap().values().iterator().next().object();
+				scores_of_game.remove(indexToDelete);
+				_dht.put(Number160.createHash(_game_name + scores_game_name)).data(new Data(scores_of_game)).start().awaitUninterruptibly();
+			}
+			
+			// Removes the game's traces from the local lists.
+			j_games.remove(indexToDeleteLocal);
+			j_games_names.remove(indexToDeleteLocal);
+			j_games_nick.remove(indexToDeleteLocal);
+			
+			return true;
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return false;
 	}

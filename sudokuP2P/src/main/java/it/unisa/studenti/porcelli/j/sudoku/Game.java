@@ -41,7 +41,7 @@ public class Game {
 				
 				int option = textIO.newIntInputReader()
 						.withMaxVal(6)
-						.withMinVal(1)
+						.withMinVal(0)
 						.read("Option");
 				switch (option) {
 				case 1:
@@ -49,7 +49,7 @@ public class Game {
 					String name = textIO.newStringInputReader()
 					        .withDefaultValue("default-sudoku")
 					        .read("Name:");
-					terminal.printf("\nEnter the difficulty\n1- Very Easy\n2- Easy\n3- Normal\n4- Hard\n5- Very Hard\n6- Insane (no, really... are you insane? :o)\n\n");
+					terminal.printf("\nEnter the difficulty\n0- 'Storymode'\n1- Very Easy\n2- Easy\n3- Normal\n4- Hard\n5- Very Hard\n6- Insane (no, really... are you insane? :o)\n\n");
 					String difficultyString = textIO.newStringInputReader()
 					        .withDefaultValue("1")
 					        .read(" Difficulty:");
@@ -62,7 +62,7 @@ public class Game {
 						break;
 					}
 					
-					if(difficulty < 1 || difficulty > 6)
+					if(difficulty < 0 || difficulty > 6)
 						terminal.printf("\n- Error: choose an acceptable difficulty from the list\n", name);
 					else if((peer.generateNewSudokuImproved(name, difficulty)) != null)
 						terminal.printf("\n- Sudoku game %s successfully created\n", name);
@@ -133,10 +133,28 @@ public class Game {
 						terminal.printf("\n- Error: The number must be between 1 and 9.\n");
 					else if(i < 1 || i > 9 || j < 1 || j > 9)
 						terminal.printf("\n- Error: The position's coordinates must be between 1 and 9.\n");
-					else if(peer.placeNumber(tname, i, j, number) != -2)	// Error flag is -2.
-						terminal.printf("\n- Successfully placed number\n", tname);
-					else
-						terminal.printf("\n- Error in placing the number %d in (%d, %d)\n", number, i, j);
+					else {
+						int score = peer.placeNumber(tname, i, j, number);
+						
+						if(score != -2) {	// Error flag is -2.
+							switch(score) {
+							case 1: 
+								terminal.printf("\n- Successfully placed number in %s. You scored 1 point!\n", tname);
+								break;
+							case 0:
+								terminal.printf("\n- Number already placed in %s. You scored 0 points.\n", tname);
+								break;
+							case -1:
+								terminal.printf("\n- Oh no. This number is wrong in %s. You lost 1 point...\n", tname);
+								break;
+							default:
+								terminal.printf("\n- You shoudn't be here...Who brought you to this forsaken place?\n");
+								break;
+							}
+						}
+						else
+							terminal.printf("\n- Error in placing the number %d in (%d, %d)\n", number, i, j);
+					}
 
 					break;
 				case 5:
