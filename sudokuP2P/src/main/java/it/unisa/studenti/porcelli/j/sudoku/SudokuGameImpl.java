@@ -246,7 +246,7 @@ public class SudokuGameImpl implements SudokuGame {
 					
 					// Fetch the position and the nickname used for this game.
 					int localIndex = j_games_names.indexOf(_game_name);	// Index of local arraylists.
-					String nicknameUsed = j_games_names.get(localIndex);
+					String nicknameUsed = j_games_nick.get(localIndex);
 					int globalIndex = -1;	// Index in arrays on the dht.
 					
 					// Fetching the nicknames' list.
