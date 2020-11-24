@@ -7,7 +7,6 @@ import java.util.HashSet;
 
 import it.unisa.studenti.porcelli.j.sudoku.MessageListener;
 import it.unisa.studenti.porcelli.j.sudoku.board.BoardManager;
-import it.unisa.studenti.porcelli.j.sudoku.board.SudokuPanel;
 import net.tomp2p.dht.FutureGet;
 import net.tomp2p.dht.PeerBuilderDHT;
 import net.tomp2p.dht.PeerDHT;
