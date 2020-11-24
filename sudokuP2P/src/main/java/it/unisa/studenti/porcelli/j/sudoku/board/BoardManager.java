@@ -110,12 +110,14 @@ public class BoardManager implements Serializable {
 	public void printMatrix(Integer[][] matrix) {
 		clearScreen();
 		
+		System.out.print("     ");
 		for(int k = 0; k < 10; k++)
 			System.out.print("__");
 		System.out.print("\n");
 		
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {
+				System.out.print("   ");
 				if(j%3 == 0)
 					System.out.print("|");
 				System.out.print(matrix[i][j] + " ");
@@ -124,6 +126,7 @@ public class BoardManager implements Serializable {
 			}
 			System.out.print("\n");
 			if(i%3 == 2) {
+				System.out.print("     ");
 				for(int k = 0; k < 10; k++)
 					System.out.print("__");
 				System.out.print("\n");
@@ -132,8 +135,14 @@ public class BoardManager implements Serializable {
 	}
 	
 	public static void clearScreen() {  
-	    System.out.print("\033[H\033[2J");  
-	    System.out.flush();  
+		try {
+	        if (System.getProperty("os.name").contains("Windows"))
+	            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+	        else
+	            Runtime.getRuntime().exec("clear");
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
 	}  
 	
 	/**
