@@ -46,6 +46,8 @@ public class SudokuPanel extends JPanel {
 
     private JTextField createField(int value, int row, int col) {
         JTextField field = new JTextField(2);
+        field.setFont(field.getFont().deriveFont(Font.BOLD, FIELD_PTS));
+        
         if(value != 0)
         	field.setText("" + value);
         field.setHorizontalAlignment(JTextField.CENTER);
