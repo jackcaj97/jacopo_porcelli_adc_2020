@@ -12,5 +12,7 @@ WORKDIR /app
 ENV MASTERIP=127.0.0.1
 ENV ID=0
 COPY --from=1 /app/target/sudokuP2P-1.0-jar-with-dependencies.jar /app
+RUN apk add --update fontconfig
+RUN fc-cache --force
 
 CMD /usr/bin/java -jar sudokuP2P-1.0-jar-with-dependencies.jar -m $MASTERIP -id $ID
