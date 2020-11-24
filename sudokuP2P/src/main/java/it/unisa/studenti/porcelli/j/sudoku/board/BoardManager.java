@@ -103,14 +103,21 @@ public class BoardManager implements Serializable {
 		}
 	}
 	
-	public SudokuPanel printMatrix(Integer[][] matrix) {
-		SudokuPanel panel = null;
-		SwingUtilities.invokeLater(() -> {
-            SudokuPanel.createAndShowGui(matrix);
-        });
+	/**
+	 * Outputs on the stdout the matrix.
+	 * @param matrix
+	 */
+	public void printMatrix(Integer[][] matrix) {
+		clearScreen();
+		
+		for(int k = 0; k < 10; k++)
+			System.out.print("__");
+		System.out.print("\n");
 		
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {
+				if(j%3 == 0)
+					System.out.print("|");
 				System.out.print(matrix[i][j] + " ");
 				if(j%3 == 2)
 					System.out.print("|");
@@ -122,9 +129,12 @@ public class BoardManager implements Serializable {
 				System.out.print("\n");
 			}
 		}
-		
-		return panel;
 	}
+	
+	public static void clearScreen() {  
+	    System.out.print("\033[H\033[2J");  
+	    System.out.flush();  
+	}  
 	
 	/**
 	 * Returns the board in a bidimensional array.
@@ -150,7 +160,7 @@ public class BoardManager implements Serializable {
 	 * @param number Number to place.
 	 * @return Score obtained, 0 if the position was already filled, -1 if the position in incorrect and 1 if the position is correct.
 	 */
-	public int placeNumInMatrix(Integer[][] matrix, int i, int j, int number, SudokuPanel panel) {
+	public int placeNumInMatrix(Integer[][] matrix, int i, int j, int number) {
 		
 		if(matrix[i][j] != 0) {	// Number already placed.
 			return 0;
@@ -158,7 +168,6 @@ public class BoardManager implements Serializable {
 		else {
 			if(checkPosition(matrix, i, j, number)) {	// Number correctly placed.
 				matrix[i][j] = number;
-				panel.placeValue(i, j, number);
 				return 1;
 			}
 			else {

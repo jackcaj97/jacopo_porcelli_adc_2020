@@ -36,7 +36,6 @@ public class SudokuGameImpl implements SudokuGame {
 	final private ArrayList<Integer[][]> j_games=new ArrayList<Integer[][]>();	// List of joined sudoku game boards.
 	final private ArrayList<String> j_games_names=new ArrayList<String>();	// List of joined sudoku game boards' names.
 	final private ArrayList<String> j_games_nick=new ArrayList<String>();	// List of joined sudoku game boards' nicknames used.
-	final private ArrayList<SudokuPanel> sudokuPanels = new ArrayList<SudokuPanel>();
 	
 	private int difficultyToApply;
 	private BoardManager bManager;	// To handle everything related to the sudoku board.
@@ -192,7 +191,7 @@ public class SudokuGameImpl implements SudokuGame {
 			}
 			
 			if(sudokuBoard != null)
-				sudokuPanels.add(bManager.printMatrix(sudokuBoard));
+				bManager.printMatrix(sudokuBoard);
 			
 			return true;
 		}catch (Exception e) {
@@ -245,7 +244,7 @@ public class SudokuGameImpl implements SudokuGame {
 			
 			if(sudokuBoard != null) {
 				int panelIndex = j_games_names.indexOf(_game_name);
-				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number, sudokuPanels.get(panelIndex));
+				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number);
 				
 				if(score == 1) {	// Update the matrix and the score for the leaderboard.
 					
