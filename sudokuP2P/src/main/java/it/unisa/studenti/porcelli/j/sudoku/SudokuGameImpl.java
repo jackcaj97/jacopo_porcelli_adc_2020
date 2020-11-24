@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import it.unisa.studenti.porcelli.j.sudoku.MessageListener;
 import it.unisa.studenti.porcelli.j.sudoku.board.BoardManager;
+import it.unisa.studenti.porcelli.j.sudoku.board.SudokuPanel;
 import net.tomp2p.dht.FutureGet;
 import net.tomp2p.dht.PeerBuilderDHT;
 import net.tomp2p.dht.PeerDHT;
@@ -35,6 +36,7 @@ public class SudokuGameImpl implements SudokuGame {
 	final private ArrayList<Integer[][]> j_games=new ArrayList<Integer[][]>();	// List of joined sudoku game boards.
 	final private ArrayList<String> j_games_names=new ArrayList<String>();	// List of joined sudoku game boards' names.
 	final private ArrayList<String> j_games_nick=new ArrayList<String>();	// List of joined sudoku game boards' nicknames used.
+	final private ArrayList<SudokuPanel> sudokuPanels = new ArrayList<SudokuPanel>();
 	
 	private int difficultyToApply;
 	private BoardManager bManager;	// To handle everything related to the sudoku board.
@@ -97,7 +99,6 @@ public class SudokuGameImpl implements SudokuGame {
 				_dht.put(Number160.createHash(_game_name + scores_game_name)).data(new Data(new ArrayList<Integer>())).start().awaitUninterruptibly();
 			
 			// TODO: remove
-			//board.printBoard();
 			board.printMatrix(sudokuBoard);
 			
 			return sudokuBoard;
@@ -191,7 +192,7 @@ public class SudokuGameImpl implements SudokuGame {
 			}
 			
 			if(sudokuBoard != null)
-				bManager.printMatrix(sudokuBoard);
+				sudokuPanels.add(bManager.printMatrix(sudokuBoard));
 			
 			return true;
 		}catch (Exception e) {
@@ -217,7 +218,7 @@ public class SudokuGameImpl implements SudokuGame {
 				
 				// Fetch of the board from the dht.
 				sudokuBoard = (Integer[][]) futureGet.dataMap().values().iterator().next().object();
-			
+				
 				return sudokuBoard;
 			}
 		} catch (Exception e) {
@@ -232,6 +233,9 @@ public class SudokuGameImpl implements SudokuGame {
 	@SuppressWarnings("unchecked")
 	public Integer placeNumber(String _game_name, int _i, int _j, int _number) {
 		
+		_i -= 1;
+		_j -= 1;
+		
 		// Check whether the game has been joined. Cannot place a number in a game that hasn't been joined yet.
 		if(!j_games_names.contains(_game_name))
 			return -2;
@@ -240,7 +244,8 @@ public class SudokuGameImpl implements SudokuGame {
 			Integer[][] sudokuBoard = getSudoku(_game_name);
 			
 			if(sudokuBoard != null) {
-				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number);
+				int panelIndex = j_games_names.indexOf(_game_name);
+				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number, sudokuPanels.get(panelIndex));
 				
 				if(score == 1) {	// Update the matrix and the score for the leaderboard.
 					

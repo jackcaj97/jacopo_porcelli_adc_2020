@@ -3,6 +3,8 @@ package it.unisa.studenti.porcelli.j.sudoku.board;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 /**
  * Class for managing all the interactions with a sudoku board.
  * @author Jacopo Porcelli
@@ -101,7 +103,12 @@ public class BoardManager implements Serializable {
 		}
 	}
 	
-	public void printMatrix(Integer[][] matrix) {
+	public SudokuPanel printMatrix(Integer[][] matrix) {
+		SudokuPanel panel = null;
+		SwingUtilities.invokeLater(() -> {
+            SudokuPanel.createAndShowGui(matrix);
+        });
+		
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 9; j++) {
 				System.out.print(matrix[i][j] + " ");
@@ -115,6 +122,8 @@ public class BoardManager implements Serializable {
 				System.out.print("\n");
 			}
 		}
+		
+		return panel;
 	}
 	
 	/**
@@ -141,7 +150,7 @@ public class BoardManager implements Serializable {
 	 * @param number Number to place.
 	 * @return Score obtained, 0 if the position was already filled, -1 if the position in incorrect and 1 if the position is correct.
 	 */
-	public int placeNumInMatrix(Integer[][] matrix, int i, int j, int number) {
+	public int placeNumInMatrix(Integer[][] matrix, int i, int j, int number, SudokuPanel panel) {
 		
 		if(matrix[i][j] != 0) {	// Number already placed.
 			return 0;
@@ -149,6 +158,7 @@ public class BoardManager implements Serializable {
 		else {
 			if(checkPosition(matrix, i, j, number)) {	// Number correctly placed.
 				matrix[i][j] = number;
+				panel.placeValue(i, j, number);
 				return 1;
 			}
 			else {

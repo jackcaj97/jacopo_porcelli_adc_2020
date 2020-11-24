@@ -36,6 +36,8 @@ public class Game {
 			terminal.printf("\nStarting peer id: %d on master node: %s\n",
 					id, master);
 			
+			Integer[][] board = new Integer[9][9];
+			
 			while(true) {
 				printMenu(terminal);
 				
@@ -89,8 +91,11 @@ public class Game {
 					String uname = textIO.newStringInputReader()
 					        .withDefaultValue("default-sudoku")
 					        .read("Name:");
-					if(peer.getSudoku(uname) != null)
+					board = peer.getSudoku(uname);
+					if(board != null) {
 						terminal.printf("\n- Successfully retrieved game %s\n", uname);
+						printMenu(terminal);
+					}
 					else
 						terminal.printf("\n- Error in retrieving game %s\n", uname);
 					break;
