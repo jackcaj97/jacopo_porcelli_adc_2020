@@ -14,6 +14,9 @@ public class BoardManager implements Serializable {
 	
 	private final int DEFAULT_DIFFICULTY = 5;
 	
+	public static final String RESET = "\033[0m";   // Text Color Reset
+	public static final String BLUE = "\033[0;34m"; // Text Color Blue
+	
 	private SudokuField field;			// Actual sudoku board.
 	private ArrayList<String> players;	// Players list
 	private ArrayList<Integer> scores;	// Players' scores list.
@@ -110,15 +113,15 @@ public class BoardManager implements Serializable {
 	public void printMatrix(Integer[][] matrix) {
 		clearScreen();
 		
-		System.out.print("i\\j  ");
 		for(int i = 0; i < 9; i++)
-			System.out.print("    "+(i+1));
-		for(int k = 0; k < 20; k++)
+			System.out.print(BLUE + " "+(i+1) + RESET);
+		System.out.println();
+		for(int k = 0; k < 15; k++)
 			System.out.print("__");
 		System.out.print("\n");
 		
 		for(int i = 0; i < 9; i++) {
-			System.out.print("  "+i);
+			System.out.print(BLUE + "  " + (i+1) + RESET + " ");
 			for(int j = 0; j < 9; j++) {
 				//System.out.print("   ");
 				if(j%3 == 0)
@@ -127,13 +130,13 @@ public class BoardManager implements Serializable {
 					System.out.print(". ");
 				else
 					System.out.print(matrix[i][j] + " ");
-				if(j%3 == 2)
+				if(j == 8)
 					System.out.print("|");
 			}
 			System.out.print("\n");
 			if(i%3 == 2) {
 				System.out.print("   ");
-				for(int k = 0; k < 20; k++)
+				for(int k = 0; k < 15; k++)
 					System.out.print("__");
 				System.out.print("\n");
 			}
