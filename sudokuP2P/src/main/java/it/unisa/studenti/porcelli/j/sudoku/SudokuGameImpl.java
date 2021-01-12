@@ -317,6 +317,8 @@ public class SudokuGameImpl implements SudokuGame {
 						}
 					}
 				}
+				bManager.printMatrix(sudokuBoard);
+				
 				return score;
 			}
 			else {

@@ -158,7 +158,7 @@ public class Game {
 							}
 						}
 						else
-							terminal.printf("\n- Error in placing the number %d in (%d, %d)\n", number, i, j);
+							terminal.printf("\n- Error in placing the number %d in (%d, %d). This error may mean that you haven't joined this sudoku game yet.\n", number, i, j);
 					}
 
 					break;
