@@ -113,19 +113,21 @@ public class BoardManager implements Serializable {
 	public void printMatrix(Integer[][] matrix) {
 		clearScreen();
 		
-		System.out.print("     ");
-		for(int i = 0; i < 9; i++)
+		System.out.print("    ");
+		for(int i = 0; i < 9; i++) {
 			System.out.print(BLUE + " "+(i+1) + RESET);
+			if(i%3 == 2)
+				System.out.print(" ");
+		}
 		System.out.println();
 		System.out.print("     ");
-		for(int k = 0; k < 11; k++)
+		for(int k = 0; k < 10; k++)
 			System.out.print("__");
 		System.out.print("\n");
 		
 		for(int i = 0; i < 9; i++) {
 			System.out.print(BLUE + "  " + (i+1) + RESET + " ");
 			for(int j = 0; j < 9; j++) {
-				//System.out.print("   ");
 				if(j%3 == 0)
 					System.out.print("|");
 				if(matrix[i][j] == 0)
@@ -137,8 +139,8 @@ public class BoardManager implements Serializable {
 			}
 			System.out.print("\n");
 			if(i%3 == 2) {
-				System.out.print("   ");
-				for(int k = 0; k < 11; k++)
+				System.out.print("     ");
+				for(int k = 0; k < 10; k++)
 					System.out.print("__");
 				System.out.print("\n");
 			}
