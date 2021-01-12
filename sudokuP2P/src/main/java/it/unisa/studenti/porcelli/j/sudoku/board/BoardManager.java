@@ -110,24 +110,30 @@ public class BoardManager implements Serializable {
 	public void printMatrix(Integer[][] matrix) {
 		clearScreen();
 		
-		System.out.print("     ");
-		for(int k = 0; k < 10; k++)
+		System.out.print("i\\j  ");
+		for(int i = 0; i < 9; i++)
+			System.out.print("    "+(i+1));
+		for(int k = 0; k < 20; k++)
 			System.out.print("__");
 		System.out.print("\n");
 		
 		for(int i = 0; i < 9; i++) {
+			System.out.print("  "+i);
 			for(int j = 0; j < 9; j++) {
-				System.out.print("   ");
+				//System.out.print("   ");
 				if(j%3 == 0)
 					System.out.print("|");
-				System.out.print(matrix[i][j] + " ");
+				if(matrix[i][j] == 0)
+					System.out.print(". ");
+				else
+					System.out.print(matrix[i][j] + " ");
 				if(j%3 == 2)
 					System.out.print("|");
 			}
 			System.out.print("\n");
 			if(i%3 == 2) {
-				System.out.print("     ");
-				for(int k = 0; k < 10; k++)
+				System.out.print("   ");
+				for(int k = 0; k < 20; k++)
 					System.out.print("__");
 				System.out.print("\n");
 			}

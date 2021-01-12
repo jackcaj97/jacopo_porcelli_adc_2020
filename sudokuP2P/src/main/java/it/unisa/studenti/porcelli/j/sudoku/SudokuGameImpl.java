@@ -253,17 +253,17 @@ public class SudokuGameImpl implements SudokuGame {
 					int globalIndex = -1;	// Index in arrays on the dht.
 					
 					// Fetching the nicknames' list.
+					ArrayList<String> nicknames_of_game = null;
 					FutureGet futureGet = _dht.get(Number160.createHash(_game_name + nicks_game_name)).start();
 					futureGet.awaitUninterruptibly();
 					if (futureGet.isSuccess()) {
 						if(futureGet.isEmpty()) 
 							return -2;
 									
-						ArrayList<String> nicknames_of_game;
 						nicknames_of_game = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
 						globalIndex = nicknames_of_game.indexOf(nicknameUsed);
 						
-						if(globalIndex == -1)	// Something went wrong.
+						if(globalIndex == -1)	// Something went wrong, not in the list of players of the game.
 							return -2;
 						
 					}
@@ -279,13 +279,13 @@ public class SudokuGameImpl implements SudokuGame {
 					}
 					
 					// Updating the personal score on the list for that sudoku game.
+					ArrayList<Integer> scores_of_game = null;
 					futureGet = _dht.get(Number160.createHash(_game_name + scores_game_name)).start();
 					futureGet.awaitUninterruptibly();
 					if (futureGet.isSuccess()) {
 						if(futureGet.isEmpty()) 
 							return -2;
 						
-						ArrayList<Integer> scores_of_game;
 						scores_of_game = (ArrayList<Integer>) futureGet.dataMap().values().iterator().next().object();
 						scores_of_game.set(globalIndex, scores_of_game.get(globalIndex) + score);		// Adds the starting score to the list of scores for that game.
 						_dht.put(Number160.createHash(_game_name + scores_game_name)).data(new Data(scores_of_game)).start().awaitUninterruptibly();
@@ -298,8 +298,13 @@ public class SudokuGameImpl implements SudokuGame {
 						
 						String message = "";
 						// If the board has just been completed.
-						if(bManager.isCompleted(sudokuBoard))
-							message = _game_name + " - " + nicknameUsed + " has just completed the sudoku!";
+						if(bManager.isCompleted(sudokuBoard)) {
+							message = _game_name + " - " + nicknameUsed + " has just completed the sudoku!\n\n";
+							message = message + "Leaderboard:\n";
+							for(int i = 0; i < nicknames_of_game.size(); i++) {
+								message = message + "- " + nicknames_of_game.get(i) + ": " + scores_of_game.get(i) + "\n";
+							}
+						}
 						else
 							message = _game_name + " - " + nicknameUsed + " has just scored a point!";
 						
