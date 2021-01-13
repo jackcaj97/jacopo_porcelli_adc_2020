@@ -51,6 +51,9 @@ public class SudokuGameImplTest {
 		// Join with a nickname already used.
 		assertFalse(p1.join("joinGame1", "nickname0"), "joined a game with an already used nickname");
 		assertTrue(p1.join("joinGame1", "nickname1"), "game not joined as intended with an unused nickname");
+		
+		assertTrue(p0.getGamesJoined().contains("joinGame1"), "p0 correctly joined the game");
+		assertTrue(p1.getGamesJoined().contains("joinGame1"), "p1 correctly joined the game");
 	}
 
 	@Test
@@ -63,13 +66,37 @@ public class SudokuGameImplTest {
 
 	@Test
 	void testPlaceNumber() {
-		//fail("Not yet implemented");
+		
 	}
 
 	@Test
 	void testLeaveGame() {
-		//fail("Not yet implemented");
+		assertFalse(p0.leaveGame("leaveGame1"), "p0 left a game not joined");
+		
+		p0.generateNewSudoku("leaveGame1");
+		p0.join("leaveGame1", "nickname0");		// p0 joined 1 game
+		p1.generateNewSudoku("leaveGame2");
+		p1.join("leaveGame1", "nickname1");
+		p1.join("leaveGame2", "nickname1");		// p1 joined 2 games
+		
+		int joinedP0 = p0.getGamesJoined().size();
+		int joinedP1 = p1.getGamesJoined().size();
+		
+		assertTrue(p0.getGamesJoined().contains("leaveGame1"));
+		assertTrue(p1.getGamesJoined().contains("leaveGame1"));
+		assertTrue(p1.getGamesJoined().contains("leaveGame2"));
+		
+		assertTrue(p0.leaveGame("leaveGame1"), "p0 didn't leave game as intended");
+		assertTrue(p1.leaveGame("leaveGame1"), "p1 didn't leave game as intended");
+		
+		assertFalse(p0.getGamesJoined().contains("leaveGame1"), "p0 didn't leave leaveGame1");
+		assertFalse(p1.getGamesJoined().contains("leaveGame1"), "p1 didn't leave leaveGame1");
+		
+		assertEquals((joinedP0-1), p0.getGamesJoined().size());
+		assertEquals((joinedP1-1), p1.getGamesJoined().size());
 	}
+	
+	
 	
 	public void leaveGames(SudokuGameImpl peer) {
 		ArrayList<String> games = new ArrayList<String>();

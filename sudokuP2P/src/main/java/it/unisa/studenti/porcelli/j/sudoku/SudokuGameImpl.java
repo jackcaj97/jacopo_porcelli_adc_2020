@@ -353,6 +353,9 @@ public class SudokuGameImpl implements SudokuGame {
 	@SuppressWarnings("unchecked")
 	public boolean leaveGame(String _game_name) {
 		
+		if(!j_games_names.contains(_game_name))	// Trying to leave a game not joined.
+			return false;
+		
 		try {
 			
 			// Removes itself from the list of peers playing this sudoku game.
