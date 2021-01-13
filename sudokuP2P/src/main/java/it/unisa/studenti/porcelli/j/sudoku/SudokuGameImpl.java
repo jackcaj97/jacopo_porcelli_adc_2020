@@ -36,7 +36,7 @@ public class SudokuGameImpl implements SudokuGame {
 	final private ArrayList<String> j_games_names=new ArrayList<String>();	// List of joined sudoku game boards' names.
 	final private ArrayList<String> j_games_nick=new ArrayList<String>();	// List of joined sudoku game boards' nicknames used.
 	
-	private int difficultyToApply;
+	private int difficultyToApply = 1;
 	private BoardManager bManager;	// To handle everything related to the sudoku board.
 	
 	public SudokuGameImpl( int _id, String _master_peer, final MessageListener _listener) throws Exception {
@@ -62,6 +62,10 @@ public class SudokuGameImpl implements SudokuGame {
 	
 	
 	public Integer[][] generateNewSudoku(String _game_name) {
+		
+		if(_game_name.length() == 0) {
+			return null;
+		}
 		
 		BoardManager board = new BoardManager(_game_name);
 		
@@ -114,6 +118,11 @@ public class SudokuGameImpl implements SudokuGame {
 	 */
 	public Integer[][] generateNewSudokuImproved(String _game_name, int _difficulty) {
 		
+		if(_game_name.length() == 0)
+			return null;
+		if(_difficulty < 0 || _difficulty > 6)
+			return null;
+		
 		this.difficultyToApply = _difficulty;
 		
 		Integer[][] sudokuBoard = generateNewSudoku(_game_name);
@@ -125,6 +134,9 @@ public class SudokuGameImpl implements SudokuGame {
 	
 	@SuppressWarnings("unchecked")
 	public boolean join(String _game_name, String _nickname) {
+		
+		if(_game_name.length() == 0 || _nickname.length() == 0)
+			return false;
 		
 		// Check whether the game is already joined.
 		if(j_games_names.contains(_game_name))
@@ -142,6 +154,7 @@ public class SudokuGameImpl implements SudokuGame {
 							
 				ArrayList<String> nicknames_of_game;
 				nicknames_of_game = (ArrayList<String>) futureGet.dataMap().values().iterator().next().object();
+				// Checks if the nickname has already been used.
 				if(nicknames_of_game.contains(_nickname))
 					return false;
 				nicknames_of_game.add(_nickname);	// Adds the nickname chosen to the list of nicks for that game.
@@ -242,7 +255,6 @@ public class SudokuGameImpl implements SudokuGame {
 			Integer[][] sudokuBoard = getSudoku(_game_name);
 			
 			if(sudokuBoard != null) {
-				int panelIndex = j_games_names.indexOf(_game_name);
 				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number);
 				
 				if(score == 1) {	// Update the matrix and the score for the leaderboard.
@@ -404,6 +416,11 @@ public class SudokuGameImpl implements SudokuGame {
 		_dht.peer().announceShutdown().start().awaitUninterruptibly();
 		
 		return true;
+	}
+	
+	
+	public ArrayList<String> getGamesJoined() {
+		return j_games_names;
 	}
 	
 }

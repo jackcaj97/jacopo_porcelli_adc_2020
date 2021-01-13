@@ -26,6 +26,8 @@ public class Game {
 		Game game = new Game();
 		final CmdLineParser parser = new CmdLineParser(game);  
 		
+		BoardManager bManager = new BoardManager();
+		
 		try  
 		{  
 			parser.parseArgument(args);  
@@ -84,7 +86,7 @@ public class Game {
 					if(peer.join(sname, nickname))
 						terminal.printf("\n- Successfully joined game %s as %s\n", sname, nickname);
 					else
-						terminal.printf("\n- Error in joining the game %s\n", sname);
+						terminal.printf("\n- Error in joining the game %s. You may already have joined this game or the nickname [%s] has already been used.\n", sname, nickname);
 					break;
 				case 3:
 					terminal.printf("\nEnter the Sudoku game you want to see\n");
@@ -93,6 +95,7 @@ public class Game {
 					        .read("Name:");
 					board = peer.getSudoku(uname);
 					if(board != null) {
+						bManager.printMatrix(board);
 						terminal.printf("\n- Successfully retrieved game %s\n", uname);
 						printMenu(terminal);
 					}
