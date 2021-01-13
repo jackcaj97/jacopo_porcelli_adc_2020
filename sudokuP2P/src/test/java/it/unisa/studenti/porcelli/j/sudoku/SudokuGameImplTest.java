@@ -7,15 +7,11 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
-class SudokuGameImplTest {
+public class SudokuGameImplTest {
 	
 	private static SudokuGameImpl p0, p1, p2, p3;
-	
-	public SudokuGameImplTest() {
-		
-	}
 
-	static class MessageListenerImpl implements MessageListener{
+	static class MessageListenerImpl implements MessageListener {
 		int peerid;
 
 		public MessageListenerImpl(int peerid) {
@@ -73,7 +69,7 @@ class SudokuGameImplTest {
 	}
 	
 	@AfterEach
-    public void leaveAll() {
+    void leaveAll() {
         leaveGames(p0);
         leaveGames(p1);
         leaveGames(p2);
