@@ -36,18 +36,29 @@ public class SudokuGameImplTest {
 	@Test
 	void testGenerateNewSudoku() {
 		assertNotNull(p1.generateNewSudoku("generateGame1"), "game1 not created");
-        assertNull(p2.generateNewSudoku("generateGame1"), "created a game that already existed [game1]");
+        assertNull(p2.generateNewSudoku("generateGame1"), "created a game that already existed [game1]");	// Cannot create a sudoku with the same name.
         assertNotNull(p3.generateNewSudoku("generateGame2"), "game2 not created");
 	}
 
 	@Test
 	void testJoin() {
-		//fail("Not yet implemented");
+		// Join in a game not created.
+		assertFalse(p0.join("joinGame1", "nickname0"), "joined a game not created yet");
+		
+		p0.generateNewSudoku("joinGame1");
+		assertTrue(p0.join("joinGame1", "nickname0"), "game not joined as intended");
+		
+		// Join with a nickname already used.
+		assertFalse(p1.join("joinGame1", "nickname0"), "joined a game with an already used nickname");
+		assertTrue(p1.join("joinGame1", "nickname1"), "game not joined as intended with an unused nickname");
 	}
 
 	@Test
 	void testGetSudoku() {
-		//fail("Not yet implemented");
+		assertNull(p0.getSudoku("getGame1"), "managed to get a non-existent game");	// Try to get a not yet created game.
+		
+		p0.generateNewSudoku("getGame1");
+		assertNotNull(p1.getSudoku("getGame1"), "didn't get a created game as intended");
 	}
 
 	@Test
@@ -78,7 +89,15 @@ public class SudokuGameImplTest {
 
 	@AfterAll
 	void leaveNetwork() {
-		//fail("Not yet implemented");
+		assertTrue(p0.leaveNetwork(), "p0 didn't leave the network");
+		assertTrue(p1.leaveNetwork(), "p0 didn't leave the network");
+		assertTrue(p2.leaveNetwork(), "p0 didn't leave the network");
+		assertTrue(p3.leaveNetwork(), "p0 didn't leave the network");
+		
+		assertEquals(0, p0.getGamesJoined().size(), "p0 still has some games joined");
+		assertEquals(0, p1.getGamesJoined().size(), "p1 still has some games joined");
+		assertEquals(0, p2.getGamesJoined().size(), "p2 still has some games joined");
+		assertEquals(0, p3.getGamesJoined().size(), "p3 still has some games joined");
 	}
 
 }
