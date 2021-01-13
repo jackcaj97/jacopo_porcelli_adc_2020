@@ -88,7 +88,7 @@ public class SudokuGameImplTest {
     }
 
 	@AfterAll
-	void leaveNetwork() {
+	static void leaveNetwork() {
 		assertTrue(p0.leaveNetwork(), "p0 didn't leave the network");
 		assertTrue(p1.leaveNetwork(), "p0 didn't leave the network");
 		assertTrue(p2.leaveNetwork(), "p0 didn't leave the network");
