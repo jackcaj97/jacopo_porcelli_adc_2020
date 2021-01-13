@@ -1,10 +1,10 @@
 FROM alpine/git
 WORKDIR /app
-RUN git clone https://github.com/jackcaj97/SudokuP2P.git
+RUN git clone https://github.com/jackcaj97/jacopo_porcelli_adc_2020.git
 
 FROM maven:3.5-jdk-8-alpine
 WORKDIR /app
-COPY --from=0 /app/SudokuP2P/sudokuP2P /app
+COPY --from=0 /app/jacopo_porcelli_adc_2020/sudokuP2P /app
 RUN mvn package
 
 FROM openjdk:8-jre-alpine
