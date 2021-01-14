@@ -99,7 +99,7 @@ public class SudokuGameImplTest {
 		}
 		
 		// Placing a number in an already filled cell of the sudoku.
-		assertEquals(0, p0.placeNumber("placeGame1", iFilled, jFilled, 1));
+		assertEquals(0, p0.placeNumber("placeGame1", iFilled+1, jFilled+1, 1));
 		
 		// Placing a wrong number in an empty cell.
 		int num = 1;
@@ -107,14 +107,14 @@ public class SudokuGameImplTest {
 			if(!bManager.checkPosition(board, iEmpty, jEmpty, num))
 				break;
 		}
-		assertEquals(-1, p1.placeNumber("placeGame1", iEmpty, jEmpty, num));
+		assertEquals(-1, p1.placeNumber("placeGame1", iEmpty+1, jEmpty+1, num));
 		
 		// Placing the right number in an empty cell.
 		for(num = 1; num < 10; num++) {
 			if(bManager.checkPosition(board, iEmpty, jEmpty, num))
 				break;
 		}
-		assertEquals(1, p0.placeNumber("placeGame1", iEmpty, jEmpty, num));
+		assertEquals(1, p0.placeNumber("placeGame1", iEmpty+1, jEmpty+1, num));
 	}
 
 	@Test
