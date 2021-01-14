@@ -199,7 +199,7 @@ public class BoardManager implements Serializable {
 		}
 	}
 	
-	private boolean checkPosition(Integer[][] matrix, int i, int j, int number) {
+	public boolean checkPosition(Integer[][] matrix, int i, int j, int number) {
 		
 		return checkRow(matrix, i, number) && checkColumn(matrix, j, number) && checkSubGrid(matrix, i, j, number);
 	}

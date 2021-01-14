@@ -7,9 +7,12 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
+import it.unisa.studenti.porcelli.j.sudoku.board.BoardManager;
+
 public class SudokuGameImplTest {
 	
 	private static SudokuGameImpl p0, p1, p2, p3;
+	private static BoardManager bManager;
 
 	static class MessageListenerImpl implements MessageListener {
 		int peerid;
@@ -31,6 +34,8 @@ public class SudokuGameImplTest {
 		p1 = new SudokuGameImpl(1, "127.0.0.1", new MessageListenerImpl(1));
 		p2 = new SudokuGameImpl(2, "127.0.0.1", new MessageListenerImpl(2));
 		p3 = new SudokuGameImpl(3, "127.0.0.1", new MessageListenerImpl(3));
+		
+		bManager = new BoardManager();
 	}
 
 	@Test
@@ -66,7 +71,50 @@ public class SudokuGameImplTest {
 
 	@Test
 	void testPlaceNumber() {
+		// Placing a number in a non existing game.
+		assertEquals(-2, p0.placeNumber("placeGame1", 1, 1, 1));
 		
+		p0.generateNewSudoku("placeGame1");
+		
+		// Placing a number in a game not joined.
+		assertEquals(-2, p1.placeNumber("placeGame1", 1, 1, 1));
+		
+		p0.join("placeGame1", "nickname0");
+		p1.join("placeGame1", "nickname1");
+		
+		Integer[][] board = p0.getSudoku("placeGame1");
+		int iFilled = 0, jFilled = 0;
+		int iEmpty = 0, jEmpty = 0;
+		for(int i = 0; i < 9; i++) {
+			for(int j = 0; j < 9; j++) {
+				if(board[i][j] != 0) {
+					iFilled = i;
+					jFilled = j;
+				}
+				else {
+					iEmpty = i;
+					jEmpty = j;
+				}
+			}
+		}
+		
+		// Placing a number in an already filled cell of the sudoku.
+		assertEquals(0, p0.placeNumber("placeGame1", iFilled, jFilled, 1));
+		
+		// Placing a wrong number in an empty cell.
+		int num = 1;
+		for(num = 1; num < 10; num++) {
+			if(!bManager.checkPosition(board, iEmpty, jEmpty, num))
+				break;
+		}
+		assertEquals(-1, p1.placeNumber("placeGame1", iEmpty, jEmpty, num));
+		
+		// Placing the right number in an empty cell.
+		for(num = 1; num < 10; num++) {
+			if(bManager.checkPosition(board, iEmpty, jEmpty, num))
+				break;
+		}
+		assertEquals(1, p0.placeNumber("placeGame1", iEmpty, jEmpty, num));
 	}
 
 	@Test

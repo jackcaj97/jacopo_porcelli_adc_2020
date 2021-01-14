@@ -36,7 +36,7 @@ public class SudokuGameImpl implements SudokuGame {
 	final private ArrayList<String> j_games_names=new ArrayList<String>();	// List of joined sudoku game boards' names.
 	final private ArrayList<String> j_games_nick=new ArrayList<String>();	// List of joined sudoku game boards' nicknames used.
 	
-	private int difficultyToApply = 1;
+	private int difficultyToApply = 0;
 	private BoardManager bManager;	// To handle everything related to the sudoku board.
 	
 	public SudokuGameImpl( int _id, String _master_peer, final MessageListener _listener) throws Exception {
@@ -243,6 +243,9 @@ public class SudokuGameImpl implements SudokuGame {
 	
 	@SuppressWarnings("unchecked")
 	public Integer placeNumber(String _game_name, int _i, int _j, int _number) {
+		
+		if(_i < 1 || _i > 9 || _j < 1 || _j > 9 || _number < 1 || _number > 9)
+			return -2;
 		
 		_i -= 1;
 		_j -= 1;
