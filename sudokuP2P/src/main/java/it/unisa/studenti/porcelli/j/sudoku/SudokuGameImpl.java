@@ -260,7 +260,7 @@ public class SudokuGameImpl implements SudokuGame {
 			if(sudokuBoard != null) {
 				int score = bManager.placeNumInMatrix(sudokuBoard, _i, _j, _number);
 				
-				if(score == 1) {	// Update the matrix and the score for the leaderboard.
+				if(score == 1 || score == -1) {	// Update the score for the leaderboard and eventually the matrix.
 					
 					// Fetch the position and the nickname used for this game.
 					int localIndex = j_games_names.indexOf(_game_name);	// Index of local arraylists.
@@ -284,13 +284,15 @@ public class SudokuGameImpl implements SudokuGame {
 					}
 					
 					// Updating the sudoku game board on the dht.
-					futureGet = _dht.get(Number160.createHash(_game_name)).start();
-					futureGet.awaitUninterruptibly();
-					if (futureGet.isSuccess()) {
-						if(futureGet.isEmpty()) 
-							return -2;
-						
-						_dht.put(Number160.createHash(_game_name)).data(new Data(sudokuBoard)).start().awaitUninterruptibly();
+					if(score == 1) {
+						futureGet = _dht.get(Number160.createHash(_game_name)).start();
+						futureGet.awaitUninterruptibly();
+						if (futureGet.isSuccess()) {
+							if(futureGet.isEmpty()) 
+								return -2;
+							
+							_dht.put(Number160.createHash(_game_name)).data(new Data(sudokuBoard)).start().awaitUninterruptibly();
+						}
 					}
 					
 					// Updating the personal score on the list for that sudoku game.
@@ -307,28 +309,30 @@ public class SudokuGameImpl implements SudokuGame {
 					}
 					
 					// Notify all the players for that Sudoku about the new score.
-					futureGet = _dht.get(Number160.createHash(_game_name + players_game_name)).start();
-					futureGet.awaitUninterruptibly();
-					if (futureGet.isSuccess()) {
-						
-						String message = "";
-						// If the board has just been completed.
-						if(bManager.isCompleted(sudokuBoard)) {
-							message = _game_name + " - " + nicknameUsed + " has just completed the sudoku!\n\n";
-							message = message + "Leaderboard:\n";
-							for(int i = 0; i < nicknames_of_game.size(); i++) {
-								message = message + "- " + nicknames_of_game.get(i) + ": " + scores_of_game.get(i) + "\n";
+					if(score == 1) {
+						futureGet = _dht.get(Number160.createHash(_game_name + players_game_name)).start();
+						futureGet.awaitUninterruptibly();
+						if (futureGet.isSuccess()) {
+							
+							String message = "";
+							// If the board has just been completed.
+							if(bManager.isCompleted(sudokuBoard)) {
+								message = _game_name + " - " + nicknameUsed + " has just completed the sudoku!\n\n";
+								message = message + "Leaderboard:\n";
+								for(int i = 0; i < nicknames_of_game.size(); i++) {
+									message = message + "- " + nicknames_of_game.get(i) + ": " + scores_of_game.get(i) + "\n";
+								}
 							}
-						}
-						else
-							message = _game_name + " - " + nicknameUsed + " has just scored a point!";
-						
-						HashSet<PeerAddress> peers_on_topic;
-						peers_on_topic = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
-						for(PeerAddress peer:peers_on_topic)
-						{
-							FutureDirect futureDirect = _dht.peer().sendDirect(peer).object(message).start();
-							futureDirect.awaitUninterruptibly();
+							else
+								message = _game_name + " - " + nicknameUsed + " has just scored a point!";
+							
+							HashSet<PeerAddress> peers_of_game;
+							peers_of_game = (HashSet<PeerAddress>) futureGet.dataMap().values().iterator().next().object();
+							for(PeerAddress peer:peers_of_game)
+							{
+								FutureDirect futureDirect = _dht.peer().sendDirect(peer).object(message).start();
+								futureDirect.awaitUninterruptibly();
+							}
 						}
 					}
 				}
