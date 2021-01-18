@@ -108,21 +108,21 @@ public SudokuGameImpl( int _id, String _master_peer, final MessageListener _list
 		_dht = new PeerBuilderDHT(peer).start();
 		
 		FutureBootstrap fb = peer.bootstrap()
-								.inetAddress(InetAddress.getByName(_master_peer))
-								.ports(DEFAULT_MASTER_PORT)
-								.start();
+						.inetAddress(InetAddress.getByName(_master_peer))
+						.ports(DEFAULT_MASTER_PORT)
+						.start();
 		fb.awaitUninterruptibly();
 		if(fb.isSuccess()) {
 			peer.discover().peerAddress(
-								fb.bootstrapTo().iterator().next())
-								.start().awaitUninterruptibly();
+						fb.bootstrapTo().iterator().next())
+						.start().awaitUninterruptibly();
 		} else {
 			throw new Exception("Error in master peer bootstrap.");
 		}
 		
 		peer.objectDataReply(new ObjectDataReply() {
 			public Object reply(PeerAddress sender, Object request) 
-														throws Exception {
+									throws Exception {
 				return _listener.parseMessage(request);
 			}
 		});
@@ -200,17 +200,17 @@ The testing has been done through the usage of **JUnit**, and is done every time
 <dependencies>
 	<dependency>
 		<groupId>org.junit.jupiter</groupId>
-    	<artifactId>junit-jupiter-engine</artifactId>
-    	<version>5.5.2</version>
+    		<artifactId>junit-jupiter-engine</artifactId>
+    		<version>5.5.2</version>
 	</dependency>
 </dependencies>
 
 <plugins>
 	<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
-    </plugin>
+        	<groupId>org.apache.maven.plugins</groupId>
+        	<artifactId>maven-surefire-plugin</artifactId>
+        	<version>2.22.1</version>
+	</plugin>
 </plugins>
 ```
 
